@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 '''redis exercise'''
 import redis
-from typing import Any, Callable
+from typing import Any, Callable, Union
 import uuid
 from functools import wraps
 
@@ -9,7 +9,7 @@ from functools import wraps
 def count_calls(method: Callable) -> Callable:
     '''count how many times a function is called'''
     @wraps(method)
-    def wrapper(self, data: Any) -> str:
+    def wrapper(self, data: Union[str, bytes, int, float]) -> str:
         '''wrapper function'''
         self._redis.incr(method.__qualname__)
         return method(self, data)
@@ -19,7 +19,7 @@ def count_calls(method: Callable) -> Callable:
 def call_history(method: Callable) -> Callable:
     '''log input parameter and output value from function'''
     @wraps(method)
-    def wrapper(self, *args: Any) -> str:
+    def wrapper(self, *args: Union[str, bytes, int, float]) -> str:
         input_key = method.__qualname__ + ":inputs"
         output_key = method.__qualname__ + ":outputs"
         self._redis.rpush(input_key, str(args))
@@ -38,7 +38,7 @@ class Cache:
 
     @count_calls
     @call_history
-    def store(self, data: Any) -> str:
+    def store(self, data: Union[str, bytes, int, float]) -> str:
         '''store a data to db'''
         key = str(uuid.uuid4())
         self._redis.set(key, data)
