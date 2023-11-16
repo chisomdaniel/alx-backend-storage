@@ -4,6 +4,7 @@ import requests
 from functools import wraps
 from typing import Callable
 import redis
+from datetime import timedelta
 
 
 def count_access(fn: Callable) -> Callable:
@@ -17,7 +18,7 @@ def count_access(fn: Callable) -> Callable:
         if count is None:
             count = b'0'
         count = int(count.decode())
-        r.setex(key, 10, value=count+1)
+        r.setex(key, timedelta(seconds=10), value=count+1)
         return fn(url)
     return wrapper
 
