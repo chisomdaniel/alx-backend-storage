@@ -11,7 +11,8 @@ def count_calls(method: Callable) -> Callable:
     @wraps(method)
     def wrapper(self, data: Union[str, bytes, int, float]) -> str:
         '''wrapper function'''
-        self._redis.incr(method.__qualname__)
+        method_name = method.__qualname__
+        self._redis.incr(method_name)
         return method(self, data)
     return wrapper
 
